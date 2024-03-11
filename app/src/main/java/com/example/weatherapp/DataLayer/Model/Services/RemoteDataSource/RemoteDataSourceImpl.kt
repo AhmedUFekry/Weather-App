@@ -1,10 +1,9 @@
 package com.example.weatherapp.DataLayer.Model.Services.RemoteDataSource
 
-import com.example.weatherapp.DataLayer.Model.DataModels.WeatherDto
-import kotlinx.coroutines.flow.Flow
+import com.example.weatherapp.Utilities.Constants
 import kotlinx.coroutines.flow.flow
 
-class RemoteDataSourceImpl private constructor(private val service: WeatherWebService): RemoteDataSource{
+class RemoteDataSourceImpl private constructor(private val service: WeatherWebService): RemoteDataSource {
     companion object {
         private var instance: RemoteDataSourceImpl? = null
 
@@ -19,7 +18,12 @@ class RemoteDataSourceImpl private constructor(private val service: WeatherWebSe
     }
 
 
-    override suspend fun getWeather(lat: String, lon: String): Flow<WeatherDto> = flow{
-        emit(service.getWeather(lat, lon))
+    override fun getCurrentWeather(
+        lat: Double,
+        lon: Double,
+        lang: String,
+        units: String
+    ) = flow {
+        emit(service.getWeather(lat, lon, Constants.API_KEY, lang, units))
     }
 }

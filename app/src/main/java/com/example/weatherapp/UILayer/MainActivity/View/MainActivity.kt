@@ -1,4 +1,4 @@
-package com.example.weatherapp.UILayer.HomeScreen.View
+package com.example.weatherapp.UILayer.MainActivity.View
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

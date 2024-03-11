@@ -1,8 +1,12 @@
 package com.example.weatherapp.DataLayer.Model.Services.RemoteDataSource
 
-import com.example.weatherapp.DataLayer.Model.DataModels.WeatherDto
+import com.example.weatherapp.DataLayer.Model.DataModels.WeatherResponse
 import kotlinx.coroutines.flow.Flow
 
 interface RemoteDataSource {
-    suspend fun getWeather(lat :String, lon:String): Flow<WeatherDto>
+    fun getCurrentWeather(
+        lat: Double,
+        lon: Double,
+        lang:String,
+        units:String ) : Flow<WeatherResponse>
 }
