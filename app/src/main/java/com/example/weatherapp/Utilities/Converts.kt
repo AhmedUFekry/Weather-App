@@ -1,6 +1,5 @@
 package com.example.weatherapp.Utilities
 
-import com.example.weatherforecast.utilities.SettingsConstants
 import kotlin.math.roundToInt
 
 object Converts {

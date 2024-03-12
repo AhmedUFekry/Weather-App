@@ -113,9 +113,6 @@ implementation ("de.hdodenhof:circleimageview:3.1.0")
 implementation("com.google.android.gms:play-services-location:21.1.0")
 implementation ("com.google.android.gms:play-services-maps:18.2.0")
 
-//weatherView
-implementation("com.github.MatteoBattilana:WeatherView:2.0.3")
-
 //cardView
 implementation ("androidx.cardview:cardview:1.0.0")
 //Shimmer

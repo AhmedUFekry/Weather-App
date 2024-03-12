@@ -18,7 +18,7 @@ object SettingsConstants {
     enum class WindSpeed{M_S,MILE_HOUR}
     enum class NotificationState{ON,OFF}
 
-    fun getLocation(): Int {
+  /*  fun getLocation(): Int {
         return when (SettingsConstants.location) {
             SettingsConstants.Location.GPS -> {
                 R.id.homr
@@ -30,7 +30,7 @@ object SettingsConstants {
                 R.id.chooseDialogFragment
             }
         }
-    }
+    }*/
 
     fun getLang():String {
 

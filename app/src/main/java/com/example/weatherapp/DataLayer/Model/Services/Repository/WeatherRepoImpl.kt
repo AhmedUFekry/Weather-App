@@ -6,8 +6,8 @@ import com.example.weatherapp.DataLayer.Model.DataModels.FaviourateLocationDto
 import com.example.weatherapp.DataLayer.Model.DataModels.WeatherResponse
 import com.example.weatherapp.DataLayer.Model.Services.LocalDataSource.WeatherLocalDataSource
 import com.example.weatherapp.DataLayer.Model.Services.RemoteDataSource.RemoteDataSource
+import com.example.weatherapp.Utilities.SettingsConstants
 import com.example.weatherforecast.sharedprefernces.SharedPreferencesHelper
-import com.example.weatherforecast.utilities.SettingsConstants
 import kotlinx.coroutines.flow.Flow
 
 class WeatherRepoImpl private constructor(
