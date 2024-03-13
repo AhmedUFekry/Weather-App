@@ -31,8 +31,8 @@ class WeatherRepoImpl private constructor(
         }
     }
     override suspend fun getCurrentWeather(): Flow<WeatherResponse> {
-        val lat = SharedPreferencesHelper.getInstance(context).loadCurrentLocation("lat")?.toDouble() ?: 29.3059751
-        val long = SharedPreferencesHelper.getInstance(context).loadCurrentLocation("long")?.toDouble() ?: 30.8549351
+        val lat = SharedPreferencesHelper.getInstance(context).loadCurrentLocation("lat")?.toDouble() ?: 39.994694
+        val long = SharedPreferencesHelper.getInstance(context).loadCurrentLocation("long")?.toDouble() ?: -74.206825
         val lang = SettingsConstants.getLangCode()
         val unit = "metric"
         Log.i("TAG", "getCurrentWeather: " + lat + long)

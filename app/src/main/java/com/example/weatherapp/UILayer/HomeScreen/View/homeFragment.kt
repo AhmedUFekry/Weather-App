@@ -19,7 +19,7 @@ import com.example.weatherapp.DataLayer.Model.Services.RemoteDataSource.RemoteDa
 import com.example.weatherapp.DataLayer.Model.Services.Repository.WeatherRepoImpl
 import com.example.weatherapp.R
 import com.example.weatherapp.UILayer.HomeScreen.ViewModel.HomeViewModel
-import com.example.weatherapp.UILayer.HomeScreen.ViewModel.HomeViewModelFactory
+import com.example.weatherapp.Utilities.ViewModelFactory
 import com.example.weatherapp.Utilities.ApiState
 import com.example.weatherapp.Utilities.Converter
 import com.example.weatherapp.Utilities.Formatter
@@ -35,19 +35,12 @@ import kotlinx.coroutines.launch
 class homeFragment : Fragment() {
     lateinit var locationHelper: LocationHelper
     private lateinit var homeViewModel: HomeViewModel
-    private lateinit var homeViewModelFactory: HomeViewModelFactory
+    private lateinit var viewModelFactory: ViewModelFactory
     private lateinit var dailyAdapter: DailyAdapter
     private lateinit var hourlyAdapter: HourlyAdapter
     private lateinit var layoutManagerDaily: LinearLayoutManager
     private lateinit var layoutManagerHourly: LinearLayoutManager
     private lateinit var homeBinding: FragmentHomeBinding
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,13 +53,13 @@ class homeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        homeViewModelFactory = HomeViewModelFactory(
+        viewModelFactory = ViewModelFactory(
             WeatherRepoImpl.getInstance(
                 RemoteDataSourceImpl.getInstance(),
                 WeatherLocalDataSourceImpl.getInstance(requireContext()),requireContext()
             )
         )
-        homeViewModel = ViewModelProvider(this, homeViewModelFactory).get(HomeViewModel::class.java)
+        homeViewModel = ViewModelProvider(this, viewModelFactory).get(HomeViewModel::class.java)
 
         dailyAdapter = DailyAdapter(requireContext())
         hourlyAdapter = HourlyAdapter(requireContext())
@@ -78,6 +71,17 @@ class homeFragment : Fragment() {
 
         homeBinding.recyclerDailyWeather.adapter = dailyAdapter
         homeBinding.recyclerHourlyWeather.adapter = hourlyAdapter
+        val args = homeFragmentArgs.fromBundle(requireArguments())
+        val favLocation = args.obj
+
+        if (favLocation!=null){
+            homeViewModel.getFavoriteWeather(favLocation.locationKey.lat,favLocation.locationKey.long)
+        }else if (args.map == "map"){
+            homeViewModel.getFavoriteWeather(favLocation?.locationKey?.lat ?: 0.0,favLocation?.locationKey?.long ?:0.0)
+        }else if (args.map == "alert"){
+        }else{
+            homeViewModel.getCurrentWeather()
+        }
 
         lifecycleScope.launch(Dispatchers.Main) {
             homeViewModel.weatherStateFlow.collectLatest {
