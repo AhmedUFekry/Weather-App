@@ -4,56 +4,35 @@ package com.example.weatherapp.Utilities
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
 object Formatter {
 
+    fun convertUnixToTime(unixSeconds: Long): String =
+        formatDate(unixSeconds * 1000L, "hh:mm a")
 
-    fun convertUnixToTime(unixSeconds: Long): String {
-        val milliseconds = unixSeconds * 1000L
+    fun getSunriseAndSunset(sunrise: Long, sunset: Long): Pair<String, String> =
+        Pair(convertUnixToTime(sunrise), convertUnixToTime(sunset))
+
+    fun getFormattedHour(hour: Long?): String =
+        formatDate(hour?.times(1000L) ?: 0, "h:mm a")
+
+    fun formatDayTime(dt: Long): String =
+        formatDate(dt * 1000L, "hh:mm aa")
+
+    fun getDate(dt: Int?): String =
+        formatDate(dt?.times(1000L) ?: 0, "dd-MM-yyyy")
+
+    fun getDateTimeAlert(dt: Long): String =
+        formatDate(dt, "dd-MM-yyyy hh:mm aa")
+
+    fun getDay(dt: Long?): String =
+        formatDate(dt?.times(1000L) ?: 0, "EEEE")
+
+    fun getHour(dt: Long): String =
+        formatDate(dt * 1000L, "hh aa")
+
+    private fun formatDate(milliseconds: Long, format: String): String {
         val date = Date(milliseconds)
-        val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
-        return timeFormat.format(date)
-    }
-
-    fun getSunriseAndSunset(sunrise: Long, sunset: Long): Pair<String, String> {
-        val sunriseTime = convertUnixToTime(sunrise)
-        val sunsetTime = convertUnixToTime(sunset)
-        return Pair(sunriseTime, sunsetTime)
-    }
-
-
-    fun getFormattedHour(hour: Long?): String {
-        val sdf = SimpleDateFormat("h:mm a", Locale.getDefault())
-        val date = Date(hour?.times(1000) ?: 0)
-        return sdf.format(date)
-    }
-
-    fun formatDayTime(dt: Long): String {
-        val date = Date(dt * 1000L)
-        val formatter = SimpleDateFormat("hh:mm aa", Locale(SettingsConstants.getLang()))
+        val formatter = SimpleDateFormat(format, Locale(SettingsConstants.getLangCode()))
         return formatter.format(date)
     }
-
-    fun getDate(dt: Int?):String {
-        val date= Date(dt?.times(1000L) ?: 0)
-        val formatter = SimpleDateFormat("dd-MM-yyyy", Locale(SettingsConstants.getLang()))
-        return formatter.format(date)
-    }
-    fun getDateTimeAlert(dt:Long):String{
-        val date = Date(dt)
-        val sdf = SimpleDateFormat("dd-MM-yyyy hh:mm aa")
-        return sdf.format(date)
-    }
-
-    fun getDay(dt: Long?):String{
-        val date= Date(dt?.times(1000L) ?: 0)
-        val formatter = SimpleDateFormat("EEEE", Locale(SettingsConstants.getLang()))
-        return formatter.format(date)
-    }
-    fun getHour(dt:Long):String{
-        val date= Date(dt * 1000L)
-        val sdf = SimpleDateFormat("hh aa",Locale(SettingsConstants.getLang()))
-        return sdf.format(date)
-    }
-
 }

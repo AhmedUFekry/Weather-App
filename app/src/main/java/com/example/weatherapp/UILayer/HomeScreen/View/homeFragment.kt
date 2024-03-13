@@ -1,32 +1,51 @@
 package com.example.weatherapp.UILayer.HomeScreen.View
 
+import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.example.weatherapp.DataLayer.Model.DataModels.WeatherResponse
+import com.example.weatherapp.DataLayer.Model.Services.LocalDataSource.WeatherLocalDataSourceImpl
+import com.example.weatherapp.DataLayer.Model.Services.RemoteDataSource.RemoteDataSourceImpl
+import com.example.weatherapp.DataLayer.Model.Services.Repository.WeatherRepoImpl
 import com.example.weatherapp.R
+import com.example.weatherapp.UILayer.HomeScreen.ViewModel.HomeViewModel
+import com.example.weatherapp.UILayer.HomeScreen.ViewModel.HomeViewModelFactory
+import com.example.weatherapp.Utilities.ApiState
+import com.example.weatherapp.Utilities.Converter
+import com.example.weatherapp.Utilities.Formatter
+import com.example.weatherapp.Utilities.LocationHelper
+import com.example.weatherapp.Utilities.SettingsConstants
+import com.example.weatherapp.databinding.FragmentHomeBinding
+import com.example.weatherforecast.utilities.LocationUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [homeFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class homeFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    lateinit var locationHelper: LocationHelper
+    private lateinit var homeViewModel: HomeViewModel
+    private lateinit var homeViewModelFactory: HomeViewModelFactory
+    private lateinit var dailyAdapter: DailyAdapter
+    private lateinit var hourlyAdapter: HourlyAdapter
+    private lateinit var layoutManagerDaily: LinearLayoutManager
+    private lateinit var layoutManagerHourly: LinearLayoutManager
+    private lateinit var homeBinding: FragmentHomeBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+
         }
     }
 
@@ -34,27 +53,116 @@ class homeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false)
+        homeBinding = FragmentHomeBinding.inflate(inflater, container, false)
+
+        return homeBinding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment homeFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            homeFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        homeViewModelFactory = HomeViewModelFactory(
+            WeatherRepoImpl.getInstance(
+                RemoteDataSourceImpl.getInstance(),
+                WeatherLocalDataSourceImpl.getInstance(requireContext()),requireContext()
+            )
+        )
+        homeViewModel = ViewModelProvider(this, homeViewModelFactory).get(HomeViewModel::class.java)
+
+        dailyAdapter = DailyAdapter(requireContext())
+        hourlyAdapter = HourlyAdapter(requireContext())
+
+        layoutManagerDaily = LinearLayoutManager(context)
+        homeBinding.recyclerDailyWeather.layoutManager = layoutManagerDaily
+        layoutManagerHourly = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        homeBinding.recyclerHourlyWeather.layoutManager = layoutManagerHourly
+
+        homeBinding.recyclerDailyWeather.adapter = dailyAdapter
+        homeBinding.recyclerHourlyWeather.adapter = hourlyAdapter
+
+        lifecycleScope.launch(Dispatchers.Main) {
+            homeViewModel.weatherStateFlow.collectLatest {
+                when(it){
+                    is ApiState.Success -> {
+                        Log.i("TAG", "onViewCreated: "+ it.data.timezone)
+                        setWeatherDataToViews(it.data)
+                        homeBinding.progressBar.visibility = View.GONE
+                        homeBinding.background.visibility = View.VISIBLE
+                        //homeBinding.emptyData.visibility = View.GONE
+                        homeBinding.home.visibility = View.GONE
+                    }
+                    is ApiState.Failed -> {
+                        Log.i("TAG", "onViewCreated: failed" + it.msg.toString())
+                        homeBinding.progressBar.visibility = View.GONE
+                        homeBinding.background.visibility = View.GONE
+                       // homeBinding.emptyData.visibility = View.VISIBLE
+                        homeBinding.home.visibility = View.VISIBLE
+                    }
+                    is ApiState.Loading -> {
+                        Log.i("TAG", "onViewCreated: loading")
+                        homeBinding.background.visibility = View.GONE
+                        homeBinding.progressBar.visibility = View.VISIBLE
+                       // homeBinding.emptyData.visibility = View.GONE
+                        homeBinding.home.visibility = View.GONE
+                    }
+                    else -> {
+                        Log.i("TAG", "onViewCreated: else")
+                    }
                 }
             }
+        }
+        locationHelper = LocationHelper(requireContext())
+        locationHelper.getLastKnownLocation {
+            homeViewModel.getCurrentWeather()
+        }
+
     }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == locationHelper.PERMISSION_ID) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                locationHelper.getLocation(requireActivity())
+            } else {
+                Toast.makeText(context, "Sorry, you don't have the write permission", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+  //add data to the view
+  private fun setWeatherDataToViews(weatherResponse: WeatherResponse) {
+      val description =  weatherResponse.current?.weather?.get(0)?.description ?: "UnKnow"
+      val temp = weatherResponse.current?.temp?.toInt() ?: 0
+
+
+
+        val imageUrl = "https://openweathermap.org/img/wn/${weatherResponse.current?.weather?.get(0)?.icon}@2x.png"
+       Glide
+           .with(requireContext())
+           .load(imageUrl)
+           .centerCrop()
+           .placeholder(R.drawable.hum_icon)
+           .into(homeBinding.tempImageDes)
+         val location = Location("").apply {
+          latitude = weatherResponse.lat ?: 0.0
+          longitude = weatherResponse.lon ?: 0.0
+      }
+      homeBinding.countryName.text = LocationUtils.getAddress(requireActivity(), weatherResponse?.lat ?: 0.0,weatherResponse.lon ?: 0.0
+      )
+      homeBinding.currentData.text = Formatter.getDate(weatherResponse.current?.dt)
+      homeBinding.desTemp.text =description
+      homeBinding.humitiyValue.text = (weatherResponse.current?.humidity ?: "0").toString() + " %"
+      homeBinding.textView2.text = (Converter.getWindSpeed(weatherResponse.current?.windSpeed) ?: "0").toString() + " "+ SettingsConstants.getWindSpeedUnit()
+      homeBinding.pressureValue.text = (weatherResponse.current?.pressure  ?: "0").toString()
+      homeBinding.cloudValue.text = (weatherResponse.current?.clouds  ?: "0").toString()
+      homeBinding.tempValue.text = Converter.getTemperature(temp).toString()
+      homeBinding.tempMeasure.text = SettingsConstants.getTemperatureSymbol().toString()
+      hourlyAdapter.submitList(weatherResponse.hourly)
+      dailyAdapter.submitList(weatherResponse.daily)
+
+  }
+
 }

@@ -4,82 +4,81 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.res.Configuration
-import android.content.res.Resources
 import android.os.Build
 import java.util.Locale
 
-object
-LanguageUtilts {
-    fun get_En_To_Ar_Numbers(number: String): String {
-        val arabicNumber = mutableListOf<String>()
+import java.util.*
+
+object LanguageUtils {
+
+    fun getArabicNumbers(number: String): String {
+        val arabicNumberMap = mapOf(
+            '0' to "٠",
+            '1' to "١",
+            '2' to "٢",
+            '3' to "٣",
+            '4' to "٤",
+            '5' to "٥",
+            '6' to "٦",
+            '7' to "٧",
+            '8' to "٨",
+            '9' to "٩"
+        )
+        val arabicNumber = StringBuilder()
         for (element in number) {
-            when (element) {
-                '1' -> arabicNumber.add("١")
-                '2' -> arabicNumber.add("٢")
-                '3' -> arabicNumber.add("٣")
-                '4' -> arabicNumber.add("٤")
-                '5' -> arabicNumber.add("٥")
-                '6' -> arabicNumber.add("٦")
-                '7' -> arabicNumber.add("٧")
-                '8' -> arabicNumber.add("٨")
-                '9' -> arabicNumber.add("٩")
-                '0' ->arabicNumber.add("٠")
-                else -> arabicNumber.add("")
-            }
+            arabicNumber.append(arabicNumberMap[element] ?: "")
         }
         return arabicNumber.toString()
-            .replace("[", "")
-            .replace("]", "")
-            .replace(",", "")
-            .replace(" ", "")
     }
 
-
-    fun setAppLayoutDirections(locale:String,context: Context){
-        val configuration: Configuration = context.resources.configuration
+    fun setAppLayoutDirections(locale: String, context: Context) {
+        val configuration = Configuration(context.resources.configuration)
         configuration.setLayoutDirection(Locale(locale))
-        context.resources.updateConfiguration(configuration, context.resources.displayMetrics)
+        applyConfiguration(configuration, context)
     }
 
     @SuppressLint("ObsoleteSdkInt")
     fun setAppLocale(localeCode: String, context: Context) {
         val resources = context.resources
         val dm = resources.displayMetrics
-        val config: Configuration = resources.configuration
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
-        {
-            config.setLocale(Locale(localeCode))
-        }
-        else
-        {
-            config.locale = Locale(localeCode)
-        }
-        resources.updateConfiguration(config, dm)
+        val config = Configuration(resources.configuration)
+        setLocaleCompat(config, Locale(localeCode))
+        applyConfiguration(config, context)
     }
+
     @SuppressLint("ObsoleteSdkInt")
-    fun changeLang(context: Context, lang_code: String): ContextWrapper {
-        var myContext=context
-        val sysLocale: Locale
-        val rs: Resources = context.resources
-        val config: Configuration = rs.configuration
-        sysLocale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            config.locales.get(0)
+    fun changeLang(context: Context, langCode: String): ContextWrapper {
+        var updatedContext = context
+        val sysLocale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            context.resources.configuration.locales.get(0)
         } else {
-            config.locale
+            context.resources.configuration.locale
         }
-        if (lang_code != "" && !sysLocale.language.equals(lang_code)) {
-            val locale = Locale(lang_code)
+        if (langCode.isNotEmpty() && sysLocale.language != langCode) {
+            val locale = Locale(langCode)
             Locale.setDefault(locale)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            { config.setLocale(locale) }
-            else { config.locale = locale }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
-            {
-                myContext = context.createConfigurationContext(config)
+            val config = Configuration(context.resources.configuration)
+            setLocaleCompat(config, locale)
+            updatedContext = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                context.createConfigurationContext(config)
             } else {
-                myContext.resources.updateConfiguration(config, context.resources.displayMetrics)
+                applyConfiguration(config, context)
+                context
             }
         }
-        return ContextWrapper(myContext)
+        return ContextWrapper(updatedContext)
+    }
+
+    @Suppress("DEPRECATION")
+    private fun setLocaleCompat(config: Configuration, locale: Locale) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale)
+        } else {
+            config.locale = locale
+        }
+    }
+
+    private fun applyConfiguration(config: Configuration, context: Context) {
+        context.resources.updateConfiguration(config, context.resources.displayMetrics)
     }
 }

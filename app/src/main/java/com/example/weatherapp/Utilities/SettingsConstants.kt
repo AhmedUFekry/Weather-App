@@ -7,60 +7,30 @@ import com.example.weatherapp.R
 import com.example.weatherforecast.sharedprefernces.SharedPreferencesHelper
 
 object SettingsConstants {
-    var location: Location?=Location.GPS
-    var temperature: Temperature?=Temperature.C
-    var lang: Lang?=Lang.EN
-    var windSpeed: WindSpeed?=WindSpeed.M_S
-    var notificationState: NotificationState?=null
-    enum class Location{MAP,GPS}
-    enum class Temperature{C,K,F}
-    enum class Lang{AR,EN}
-    enum class WindSpeed{M_S,MILE_HOUR}
-    enum class NotificationState{ON,OFF}
+    var location: Location = Location.GPS
+    var temperature: Temperature = Temperature.C
+    var lang: Lang = Lang.EN
+    var windSpeed: WindSpeed = WindSpeed.M_S
+    var notificationState: NotificationState? = null
 
-  /*  fun getLocation(): Int {
-        return when (SettingsConstants.location) {
-            SettingsConstants.Location.GPS -> {
-                R.id.homr
-            }
-            SettingsConstants.Location.MAP -> {
-                R.id.map
-            }
-            else -> {
-                R.id.chooseDialogFragment
-            }
-        }
-    }*/
+    enum class Location { MAP, GPS }
+    enum class Temperature { C, K, F }
+    enum class Lang { AR, EN }
+    enum class WindSpeed { M_S, MILE_HOUR }
+    enum class NotificationState { ON, OFF }
 
-    fun getLang():String {
+    fun getLangCode(): String = lang.name.toLowerCase()
 
-        if(lang==null) {
-            return "en"
-        }
-        return if(lang==Lang.EN) {
-            "en"
-        }else{
-            "ar"
-        }
-    }
-    fun getTemp():Char{
-        return if (temperature == Temperature.F) {
-            'F'
-        }else if(temperature==Temperature.K) {
-            'K'
-        }
-        else  {
-            'C'
-        }
+    fun getTemperatureSymbol(): Char = when (temperature) {
+        Temperature.F -> 'F'
+        Temperature.K -> 'K'
+        else -> 'C'
     }
 
-    fun getWindSpeed(): String {
-        var res=""
-        res = if(getLang()=="en") {
-            if(windSpeed==WindSpeed.MILE_HOUR)" Mile/H" else "M/S"
-        }else{
-            if(windSpeed==WindSpeed.MILE_HOUR)" م/س" else "م/ث"
+    fun getWindSpeedUnit(): String {
+        return when (windSpeed) {
+            WindSpeed.MILE_HOUR -> if (lang == Lang.EN) " Mile/H" else " م/س"
+            else -> if (lang == Lang.EN) " M/S" else " م/ث"
         }
-        return res
     }
 }
