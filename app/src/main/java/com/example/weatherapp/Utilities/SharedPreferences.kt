@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.example.weatherapp.Utilities.SettingsConstants
 
-class SharedPreferencesHelper private constructor(context: Context) {
+class SharedPreferencesHelper constructor(context: Context) {
 
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 

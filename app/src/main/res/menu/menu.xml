@@ -5,20 +5,20 @@
         android:id="@+id/homeFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="Home" />
+        android:title="@string/home" />
     <item
         android:id="@+id/favouriteFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="fav" />
+        android:title="@string/favourite" />
     <item
         android:id="@+id/settingsFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="Settings" />
+        android:title="@string/settings" />
     <item
         android:id="@+id/alertFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="Alert" />
+        android:title="@string/alerts" />
 </menu>

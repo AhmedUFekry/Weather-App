@@ -20,6 +20,16 @@ object SettingsConstants {
     enum class NotificationState { ON, OFF }
 
     fun getLangCode(): String = lang.name.toLowerCase()
+    fun getLocation(): Int {
+        return when (location) {
+            Location.GPS -> {
+                R.id.homeFragment
+            }
+            Location.MAP -> {
+                R.id.mapFragment
+            }
+        }
+    }
 
     fun getTemperatureSymbol(): Char = when (temperature) {
         Temperature.F -> 'F'

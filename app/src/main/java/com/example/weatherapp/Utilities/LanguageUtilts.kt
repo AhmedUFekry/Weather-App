@@ -11,7 +11,7 @@ import java.util.*
 
 object LanguageUtils {
 
-    fun getArabicNumbers(number: String): String {
+    /*fun getArabicNumbers(number: String): String {
         val arabicNumberMap = mapOf(
             '0' to "٠",
             '1' to "١",
@@ -29,7 +29,7 @@ object LanguageUtils {
             arabicNumber.append(arabicNumberMap[element] ?: "")
         }
         return arabicNumber.toString()
-    }
+    }*/
 
     fun setAppLayoutDirections(locale: String, context: Context) {
         val configuration = Configuration(context.resources.configuration)

@@ -72,10 +72,10 @@
                     android:layout_width="150dp"
                     android:layout_height="150dp"
                     android:layout_margin="8dp"
+                    android:layout_marginTop="20dp"
                     android:background="@android:color/transparent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/temp_value" />
+                    app:layout_constraintStart_toStartOf="@+id/des_temp"
+                    app:layout_constraintTop_toBottomOf="@+id/des_temp" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_view_value"
@@ -84,6 +84,7 @@
                     android:layout_margin="18dp"
                     android:layout_marginHorizontal="8dp"
                     android:layout_marginVertical="12dp"
+                    android:layout_marginTop="20dp"
                     app:cardBackgroundColor="#7E351D1D"
                     app:cardElevation="8dp"
                     app:cardMaxElevation="10dp"
@@ -91,7 +92,7 @@
                     app:contentPaddingBottom="4dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/temp_image_des"
+                    app:layout_constraintTop_toBottomOf="@+id/current_data"
                     app:strokeWidth="0.5dp">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
@@ -257,19 +258,23 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+
+                <!-- Daily Weather RecyclerView -->
+
                 <TextView
                     android:id="@+id/country_name"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="80dp"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginTop="50dp"
                     android:fontFamily="sans-serif-condensed-light"
                     android:text="Governorate, Country"
                     android:textAlignment="center"
                     android:textColor="@color/white"
                     android:textSize="23sp"
-                    android:textStyle="bold"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:layout_editor_absoluteX="0dp" />
+                    android:textStyle="bold|italic"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/current_data"
@@ -280,69 +285,63 @@
                     android:text="Fri,26 Feb"
                     android:textColor="@color/white"
                     android:textSize="16sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/country_name" />
+                    app:layout_constraintEnd_toEndOf="@+id/temp_image_des"
+                    app:layout_constraintStart_toStartOf="@+id/temp_image_des"
+                    app:layout_constraintTop_toBottomOf="@+id/temp_image_des" />
 
                 <TextView
                     android:id="@+id/des_temp"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="54dp"
+                    android:layout_marginTop="10dp"
                     android:fontFamily="sans-serif-condensed-light"
                     android:text="Weather Description"
                     android:textAlignment="center"
                     android:textColor="@color/white"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    app:layout_constraintTop_toBottomOf="@+id/country_name"
-                    tools:layout_editor_absoluteX="0dp" />
+                    app:layout_constraintEnd_toEndOf="@+id/country_name"
+                    app:layout_constraintTop_toBottomOf="@+id/country_name" />
 
                 <TextView
                     android:id="@+id/temp_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="208dp"
+                    android:layout_marginStart="20dp"
                     android:fontFamily="cursive"
                     android:text="0"
                     android:textAlignment="center"
                     android:textColor="@color/white"
                     android:textSize="66sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.391"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintStart_toEndOf="@+id/temp_image_des"
+                    app:layout_constraintTop_toTopOf="@+id/des_temp" />
 
                 <TextView
                     android:id="@+id/temp_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="208dp"
                     android:fontFamily="cursive"
                     android:text="\u00B0"
                     android:textAlignment="center"
                     android:textColor="@color/white"
                     android:textSize="56sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/temp_value"
                     app:layout_constraintStart_toEndOf="@+id/temp_value"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="@+id/temp_value" />
 
                 <TextView
                     android:id="@+id/temp_measure"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="208dp"
                     android:fontFamily="cursive"
                     android:text="C"
                     android:textAlignment="center"
                     android:textColor="@color/white"
                     android:textSize="66sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/temp_view"
                     app:layout_constraintStart_toEndOf="@+id/temp_view"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="@+id/temp_view" />
 
-
-                <!-- Daily Weather RecyclerView -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recycler_daily_weather"
                     android:layout_width="match_parent"

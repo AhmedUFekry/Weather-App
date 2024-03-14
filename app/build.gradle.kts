@@ -157,6 +157,9 @@ testImplementation("androidx.test:core-ktx:$androidXTestCoreVersion")
 // AndroidX Test - Instrumented testing
 androidTestImplementation("androidx.test.ext:junit:$androidXTestExtKotlinRunnerVersion")
 androidTestImplementation("androidx.test.espresso:espresso-core:$espressoVersion")
+
+    //lotti
+    implementation ("com.airbnb.android:lottie:3.4.0")
 }
 
 kapt{

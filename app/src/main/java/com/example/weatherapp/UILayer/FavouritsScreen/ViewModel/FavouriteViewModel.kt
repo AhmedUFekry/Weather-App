@@ -20,10 +20,10 @@ class FavouriteViewModel(
     val locationList : StateFlow<ApiState<List<FaviourateLocationDto>>> = _locationList
 
     init {
-        getAllProduct()
+        getSavedLocations()
     }
 
-    private fun getAllProduct() {
+    private fun getSavedLocations() {
         viewModelScope.launch(Dispatchers.IO) {
             WeatherRepo.getLocalAllLocation()
                 .catch { e -> _locationList.value = ApiState.Failed(e) }
@@ -36,7 +36,7 @@ class FavouriteViewModel(
     fun deleteLocation(location: FaviourateLocationDto) {
         viewModelScope.launch(Dispatchers.IO) {
             WeatherRepo.deleteLocation(location)
-            getAllProduct()
+            getSavedLocations()
         }
     }
 

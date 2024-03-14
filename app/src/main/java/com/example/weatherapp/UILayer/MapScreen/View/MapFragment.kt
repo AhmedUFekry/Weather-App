@@ -44,12 +44,21 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener
         factory = ViewModelFactory(
             WeatherRepoImpl.getInstance(
                 RemoteDataSourceImpl.getInstance(),
-                WeatherLocalDataSourceImpl.getInstance(requireContext()),requireContext()))
+                WeatherLocalDataSourceImpl.getInstance(requireContext())))
         favViewModel = ViewModelProvider(this, factory).get(FavouriteViewModel::class.java)
         val arguments = MapFragmentArgs.fromBundle(requireArguments())
         val mapStringArg = arguments.fav
+        if (mapStringArg == "map"){
+            mapFragmentBinding.saveBtnLocation.text = "show Weather Detials"
+        }
         mapFragmentBinding.saveBtnLocation.setOnClickListener {
-            if (mapStringArg == "fav"){
+            if (mapStringArg == "map"){
+                val action = MapFragmentDirections.actionMapToHome()
+                action.setMap("map")
+                action.setObj(FaviourateLocationDto(LocationKey(lat,lon)
+                    ,addressGeoCoder(lat,lon),"0"))
+                Navigation.findNavController(requireView()).navigate(action)
+            }else if (mapStringArg == "fav"){
                 favViewModel.insertLocation(FaviourateLocationDto(
                     LocationKey(lat,lon)
                     ,addressGeoCoder(lat,lon),"0"))

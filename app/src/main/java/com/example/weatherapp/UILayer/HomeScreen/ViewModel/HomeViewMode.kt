@@ -1,6 +1,6 @@
 package com.example.weatherapp.UILayer.HomeScreen.ViewModel
 
-import android.util.Log
+import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.DataLayer.Model.DataModels.WeatherResponse
@@ -19,7 +19,7 @@ class HomeViewModel(
     private val _weatherMutableStateFlow = MutableStateFlow<ApiState<WeatherResponse>>(ApiState.Loading<WeatherResponse>())
 
     val weatherStateFlow: StateFlow<ApiState<WeatherResponse>> = _weatherMutableStateFlow
-    fun getCurrentWeather(){
+    /*fun getCurrentWeather(){
         viewModelScope.launch(Dispatchers.IO) {
             iWeatherRepo.getCurrentWeather()
                 .catch { _weatherMutableStateFlow.value = ApiState.Failed(it) }
@@ -27,12 +27,22 @@ class HomeViewModel(
                     _weatherMutableStateFlow.value = ApiState.Success(it)
                 }
         }
-    }
+    }*/
 
 
     fun getFavoriteWeather(lat :Double, long: Double){
         viewModelScope.launch(Dispatchers.IO) {
             iWeatherRepo.getFavouriteWeather(lat,long,"en","metric")
+                .catch { _weatherMutableStateFlow.value = ApiState.Failed(it) }
+                .collect{
+                    _weatherMutableStateFlow.value = ApiState.Success(it)
+                }
+        }
+    }
+
+    fun getCurrentWeatherfor(lat: Double,long: Double) {
+        viewModelScope.launch(Dispatchers.IO) {
+            iWeatherRepo.getCurrentWeatherfor(lat,long)
                 .catch { _weatherMutableStateFlow.value = ApiState.Failed(it) }
                 .collect{
                     _weatherMutableStateFlow.value = ApiState.Success(it)

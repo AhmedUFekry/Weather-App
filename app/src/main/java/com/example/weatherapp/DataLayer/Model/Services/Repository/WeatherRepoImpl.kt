@@ -12,31 +12,28 @@ import kotlinx.coroutines.flow.Flow
 
 class WeatherRepoImpl private constructor(
     private val weatherRemoteDataSource: RemoteDataSource,
-    private val weatherLocalDataSource: WeatherLocalDataSourceImpl,
-    private val context: Context
+    private val weatherLocalDataSource: WeatherLocalDataSourceImpl
 ) : WeatherRepo {
 
     companion object{
         private var instance : WeatherRepoImpl? = null
         fun getInstance(
             weatherRemoteDataSource: RemoteDataSource,
-            weatherLocalDataSource: WeatherLocalDataSourceImpl,
-            context: Context
+            weatherLocalDataSource: WeatherLocalDataSourceImpl
         ): WeatherRepoImpl{
             return instance?: synchronized(this){
-                val temp = WeatherRepoImpl(weatherRemoteDataSource, weatherLocalDataSource, context)
+                val temp = WeatherRepoImpl(weatherRemoteDataSource, weatherLocalDataSource)
                 instance = temp
                 temp
             }
         }
     }
-    override suspend fun getCurrentWeather(): Flow<WeatherResponse> {
-        val lat = SharedPreferencesHelper.getInstance(context).loadCurrentLocation("lat")?.toDouble() ?: 39.994694
-        val long = SharedPreferencesHelper.getInstance(context).loadCurrentLocation("long")?.toDouble() ?: -74.206825
+
+    override suspend fun getCurrentWeatherfor(lat: Double , lon: Double): Flow<WeatherResponse> {
         val lang = SettingsConstants.getLangCode()
         val unit = "metric"
-        Log.i("TAG", "getCurrentWeather: " + lat + long)
-        return weatherRemoteDataSource.getCurrentWeather(lat, long, lang,unit)
+        Log.i("TAG", "getCurrentWeatherFor: " + lat + lon)
+        return weatherRemoteDataSource.getCurrentWeather(lat, lon, lang,unit)
     }
 
     override suspend fun getLocalAllLocation(): Flow<List<FaviourateLocationDto>> {

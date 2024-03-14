@@ -66,7 +66,7 @@ class FavouriteFragment : Fragment() {
         favViewModelFactory = ViewModelFactory(
             WeatherRepoImpl.getInstance(
                 RemoteDataSourceImpl.getInstance(),
-                WeatherLocalDataSourceImpl.getInstance(requireContext()), requireContext()
+                WeatherLocalDataSourceImpl.getInstance(requireContext())
             )
         )
         favViewModel =
