@@ -33,7 +33,7 @@ tools:context=".UILayer.SettingScreen.View.settingsFragment">
         android:backgroundTint="#A17777"
         android:paddingHorizontal="16dp"
         android:paddingVertical="8dp"
-        android:text="Location Provider"
+        android:text="@string/LocationProvider"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="20sp"
@@ -338,13 +338,13 @@ tools:context=".UILayer.SettingScreen.View.settingsFragment">
                     android:id="@+id/radio_enable"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="On" />
+                    android:text="@string/on" />
 
                 <RadioButton
                     android:id="@+id/radio_disable"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Off" />
+                    android:text="@string/Off" />
             </RadioGroup>
         </LinearLayout>
 
@@ -358,7 +358,7 @@ tools:context=".UILayer.SettingScreen.View.settingsFragment">
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:backgroundTint="#A17777"
-        android:text="Apply Changes"
+        android:text="@string/ApplyChangesbtn"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
