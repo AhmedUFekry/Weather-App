@@ -9,7 +9,6 @@ class SharedPreferencesHelper constructor(context: Context) {
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
     companion object {
-        private const val PREF_KEY_DIALOG_SHOWN = "dialog_shown"
         private const val PREF_KEY_LOCATION = "location"
         private const val PREF_KEY_TEMPERATURE = "temperature"
         private const val PREF_KEY_LANG = "lang"
@@ -27,21 +26,11 @@ class SharedPreferencesHelper constructor(context: Context) {
         }
     }
 
-    fun setDialogShown(shown: Boolean) {
-        sharedPreferences.edit().putBoolean(PREF_KEY_DIALOG_SHOWN, shown).apply()
-    }
-
-    fun isDialogShown(): Boolean {
-        return sharedPreferences.getBoolean(PREF_KEY_DIALOG_SHOWN, false)
-    }
 
     fun saveCurrentLocation(key: String, value: Double?) {
         sharedPreferences.edit().putString(key, value.toString()).apply()
     }
 
-    fun loadCurrentLocation(key: String): String? {
-        return sharedPreferences.getString(key, null)
-    }
 
     fun insertInData() {
         val editor = sharedPreferences.edit()

@@ -19,20 +19,11 @@ class HomeViewModel(
     private val _weatherMutableStateFlow = MutableStateFlow<ApiState<WeatherResponse>>(ApiState.Loading<WeatherResponse>())
 
     val weatherStateFlow: StateFlow<ApiState<WeatherResponse>> = _weatherMutableStateFlow
-    /*fun getCurrentWeather(){
-        viewModelScope.launch(Dispatchers.IO) {
-            iWeatherRepo.getCurrentWeather()
-                .catch { _weatherMutableStateFlow.value = ApiState.Failed(it) }
-                .collect{
-                    _weatherMutableStateFlow.value = ApiState.Success(it)
-                }
-        }
-    }*/
 
 
     fun getFavoriteWeather(lat :Double, long: Double){
         viewModelScope.launch(Dispatchers.IO) {
-            iWeatherRepo.getFavouriteWeather(lat,long,"en","metric")
+            iWeatherRepo.getCurrentWeatherfor(lat,long)
                 .catch { _weatherMutableStateFlow.value = ApiState.Failed(it) }
                 .collect{
                     _weatherMutableStateFlow.value = ApiState.Success(it)

@@ -16,8 +16,4 @@ object Converter {
         else
             "${w ?: 0}"
     }
-
-    const val IMG_URL = "https://openweathermap.org/img/w/"
-
-    fun getImageUrl(iconCode: String): String = "$IMG_URL$iconCode.png"
 }

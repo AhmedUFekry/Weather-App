@@ -1,6 +1,9 @@
 package com.example.weatherapp.UILayer.HomeScreen.View
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
+import android.health.connect.datatypes.units.Length
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
@@ -9,8 +12,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.weatherapp.DataLayer.Model.DataModels.WeatherResponse
@@ -27,9 +32,13 @@ import com.example.weatherapp.Utilities.LocationHelper
 import com.example.weatherapp.Utilities.SettingsConstants
 import com.example.weatherapp.databinding.FragmentHomeBinding
 import com.example.weatherforecast.utilities.LocationUtils
+import com.example.weatherforecast.utilities.NetworkConnection
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.io.FileNotFoundException
+import java.io.IOException
 
 
 class homeFragment : Fragment() {
@@ -51,6 +60,7 @@ class homeFragment : Fragment() {
         return homeBinding.root
     }
 
+    @SuppressLint("UnsafeRepeatOnLifecycleDetector")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModelFactory = ViewModelFactory(
@@ -97,51 +107,52 @@ class homeFragment : Fragment() {
                 }
             }
         }
+        homeBinding.swipeContainer.setOnRefreshListener {
 
-        lifecycleScope.launch(Dispatchers.Main) {
-            homeViewModel.weatherStateFlow.collectLatest {
-                when(it){
-                    is ApiState.Success -> {
-                        Log.i("TAG", "onViewCreated: "+ it.data.timezone)
-                        setWeatherDataToViews(it.data)
-                        homeBinding.progressBar.visibility = View.GONE
-                        homeBinding.background.visibility = View.VISIBLE
-                        homeBinding.home.visibility = View.GONE
-                    }
-                    is ApiState.Failed -> {
-                        Log.i("TAG", "onViewCreated: failed" + it.msg.toString())
-                        homeBinding.progressBar.visibility = View.GONE
-                        homeBinding.background.visibility = View.GONE
-                        homeBinding.home.visibility = View.VISIBLE
-                    }
-                    is ApiState.Loading -> {
-                        Log.i("TAG", "onViewCreated: loading")
-                        homeBinding.background.visibility = View.GONE
-                        homeBinding.progressBar.visibility = View.VISIBLE
-                        homeBinding.home.visibility = View.GONE
+            if (NetworkConnection.checkConnectionState(requireActivity())) {
+                homeBinding.swipeContainer.isRefreshing = false
+                lifecycleScope.launch(Dispatchers.Main) {
+                    repeatOnLifecycle(Lifecycle.State.STARTED) {
+                        homeViewModel.weatherStateFlow.collectLatest {
+                            when (it) {
+                                is ApiState.Success -> {
+                                    Log.i("TAG", "onViewCreated: " + it.data.timezone)
+                                    setWeatherDataToViews(it.data)
+                                    saveResponseToFile(it.data)
+                                    homeBinding.progressBar.visibility = View.GONE
+                                    homeBinding.background.visibility = View.VISIBLE
+                                    homeBinding.home.visibility = View.GONE
+                                }
+
+                                is ApiState.Failed -> {
+                                    Log.i("TAG", "onViewCreated: failed" + it.msg.toString())
+                                    homeBinding.progressBar.visibility = View.GONE
+                                    homeBinding.background.visibility = View.GONE
+                                    homeBinding.home.visibility = View.VISIBLE
+                                }
+
+                                is ApiState.Loading -> {
+                                    Log.i("TAG", "onViewCreated: loading")
+                                    homeBinding.background.visibility = View.GONE
+                                    homeBinding.progressBar.visibility = View.VISIBLE
+                                    homeBinding.home.visibility = View.GONE
+                                }
+                            }
+                        }
                     }
                 }
-            }
-        }
-
-
-
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == locationHelper.PERMISSION_ID) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                locationHelper.getLocation(requireActivity())
             } else {
-                Toast.makeText(context, "Sorry, you don't have the write permission", Toast.LENGTH_SHORT).show()
+                homeBinding.swipeContainer.isRefreshing = false
+                loadWeatherResponseFromFile()?.let { setWeatherDataToViews(it) }
+                Toast.makeText(requireContext(), "Check Your Network Connection", Toast.LENGTH_LONG)
+                    .show()
+
             }
         }
+
     }
+
+
 
   //add data to the view
   private fun setWeatherDataToViews(weatherResponse: WeatherResponse) {
@@ -157,14 +168,10 @@ class homeFragment : Fragment() {
            .centerCrop()
            .placeholder(R.drawable.hum_icon)
            .into(homeBinding.tempImageDes)
-         val location = Location("").apply {
-          latitude = weatherResponse.lat ?: 0.0
-          longitude = weatherResponse.lon ?: 0.0
-      }
-      homeBinding.countryName.text = LocationUtils.getAddress(requireActivity(), weatherResponse?.lat ?: 0.0,weatherResponse.lon ?: 0.0
-      )
+
+      homeBinding.countryName.text = LocationUtils.getAddress(requireActivity(), weatherResponse?.lat ?: 0.0,weatherResponse.lon ?: 0.0)
       homeBinding.currentData.text = Formatter.getDate(weatherResponse.current?.dt)
-      homeBinding.desTemp.text =description
+      homeBinding.desTemp.text = description
       homeBinding.humitiyValue.text = (weatherResponse.current?.humidity ?: "0").toString() + " %"
       homeBinding.textView2.text = (Converter.getWindSpeed(weatherResponse.current?.windSpeed) ?: "0").toString() + " "+ SettingsConstants.getWindSpeedUnit()
       homeBinding.pressureValue.text = (weatherResponse.current?.pressure  ?: "0").toString()
@@ -175,5 +182,29 @@ class homeFragment : Fragment() {
       dailyAdapter.submitList(weatherResponse.daily)
 
   }
+
+    private fun saveResponseToFile(response: WeatherResponse) {
+        val context = requireContext().applicationContext
+        val filename = "offlineweather.json"
+        context.deleteFile(filename)
+        val jsonString = Gson().toJson(response)
+        context.openFileOutput(filename, Context.MODE_PRIVATE).use { outputStream ->
+            outputStream.write(jsonString.toByteArray())
+        }
+    }
+
+
+    private fun loadWeatherResponseFromFile(): WeatherResponse? {
+        val filename = "offlineweather.json"
+        return try {
+            val inputStream = requireActivity().openFileInput(filename)
+            val jsonString = inputStream.bufferedReader().use { it.readText() }
+            Gson().fromJson(jsonString, WeatherResponse::class.java)
+        } catch (e: FileNotFoundException) {
+            null
+        } catch (e: IOException) {
+            null
+        }
+    }
 
 }

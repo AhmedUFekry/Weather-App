@@ -11,4 +11,6 @@ object NetworkConnection {
             isAvailable && isConnected
         } ?: false
     }
+
+
 }

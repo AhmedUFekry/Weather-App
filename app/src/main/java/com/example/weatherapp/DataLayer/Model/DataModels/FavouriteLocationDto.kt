@@ -6,7 +6,7 @@ import androidx.room.TypeConverter
 import java.io.Serializable
 
 @Entity(tableName = "fav_table")
-data class FaviourateLocationDto(
+data class FavouriteLocationDto(
      @PrimaryKey val locationKey: LocationKey,
      val countryName: String,
      val temp: String

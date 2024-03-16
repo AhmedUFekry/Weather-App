@@ -1,10 +1,10 @@
 package com.example.weatherapp.DataLayer.Model.Services.LocalDataSource
 
 import android.content.Context
-import com.example.weatherapp.DataLayer.Model.DataModels.FaviourateLocationDto
+import com.example.weatherapp.DataLayer.Model.DataModels.FavouriteLocationDto
 import kotlinx.coroutines.flow.Flow
 
-class WeatherLocalDataSourceImpl private constructor(private val dao: WeatherDao):
+class WeatherLocalDataSourceImpl(private val dao: WeatherDao):
     WeatherLocalDataSource {
 
     companion object {
@@ -21,15 +21,15 @@ class WeatherLocalDataSourceImpl private constructor(private val dao: WeatherDao
         }
     }
 
-    override suspend fun insertLocation(location: FaviourateLocationDto) {
+    override suspend fun insertLocation(location: FavouriteLocationDto) {
         dao.insertLocation(location)
     }
 
-    override suspend fun deleteLocation(location: FaviourateLocationDto) {
+    override suspend fun deleteLocation(location: FavouriteLocationDto) {
         dao.delete(location)
     }
 
-    override suspend fun getAllLocation(): Flow<List<FaviourateLocationDto>> {
+    override suspend fun getAllLocation(): Flow<List<FavouriteLocationDto>> {
         return dao.getAllLocation()
     }
 

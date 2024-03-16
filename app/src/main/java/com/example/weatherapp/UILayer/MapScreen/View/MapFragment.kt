@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
-import com.example.weatherapp.DataLayer.Model.DataModels.FaviourateLocationDto
+import com.example.weatherapp.DataLayer.Model.DataModels.FavouriteLocationDto
 import com.example.weatherapp.DataLayer.Model.DataModels.LocationKey
 import com.example.weatherapp.DataLayer.Model.Services.LocalDataSource.WeatherLocalDataSourceImpl
 import com.example.weatherapp.DataLayer.Model.Services.RemoteDataSource.RemoteDataSourceImpl
@@ -18,6 +18,7 @@ import com.example.weatherapp.R
 import com.example.weatherapp.UILayer.FavouritsScreen.ViewModel.FavouriteViewModel
 import com.example.weatherapp.Utilities.ViewModelFactory
 import com.example.weatherapp.databinding.FragmentMapBinding
+import com.example.weatherforecast.utilities.LocationUtils
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -55,13 +56,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener
             if (mapStringArg == "map"){
                 val action = MapFragmentDirections.actionMapToHome()
                 action.setMap("map")
-                action.setObj(FaviourateLocationDto(LocationKey(lat,lon)
-                    ,addressGeoCoder(lat,lon),"0"))
+                action.setObj(FavouriteLocationDto(LocationKey(lat,lon)
+                    ,LocationUtils.getAddress(requireContext(),lat,lon),"0"))
                 Navigation.findNavController(requireView()).navigate(action)
             }else if (mapStringArg == "fav"){
-                favViewModel.insertLocation(FaviourateLocationDto(
+                favViewModel.insertLocation(FavouriteLocationDto(
                     LocationKey(lat,lon)
-                    ,addressGeoCoder(lat,lon),"0"))
+                    ,LocationUtils.getAddress(requireContext(),lat,lon),"0"))
                 Log.i("TAG", "FAV ARGS")
                 Navigation.findNavController(it).navigate(R.id.action_map_to_favourite)
             }
@@ -94,18 +95,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener
         mapFragmentBinding.cardLocation.visibility = View.VISIBLE
         gMap.clear()
         gMap.addMarker(MarkerOptions().position(latLng).title("Location"))
-        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 7f))
         lat = latLng.latitude
         lon = latLng.longitude
         val latStr = String.format("%.6f", lat)
         val lonStr = String.format("%.6f", lon)
-        mapFragmentBinding.locationName.text = addressGeoCoder(lat,lon)
-        mapFragmentBinding.locationLat.text = "$latStr ,  $lonStr"
+        mapFragmentBinding.locationName.text = LocationUtils.getAddress(requireContext(),lat,lon)
+        mapFragmentBinding.locationLat.text = "Lat:  $latStr , Long: $lonStr"
     }
 
-    private fun addressGeoCoder(lat: Double, lon: Double): String {
-        val geocoder = Geocoder(requireContext())
-        val addressList = geocoder.getFromLocation(lat, lon, 1)
-        return addressList?.get(0)?.countryName + ", "+ addressList?.get(0)?.adminArea ?: "UnKnown"
-    }
 }

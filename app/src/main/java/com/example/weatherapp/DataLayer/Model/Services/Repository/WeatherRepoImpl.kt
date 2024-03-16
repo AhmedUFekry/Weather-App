@@ -1,18 +1,16 @@
 package com.example.weatherapp.DataLayer.Model.Services.Repository
 
-import android.content.Context
-import android.util.Log
-import com.example.weatherapp.DataLayer.Model.DataModels.FaviourateLocationDto
+import com.example.weatherapp.DataLayer.Model.DataModels.FavouriteLocationDto
 import com.example.weatherapp.DataLayer.Model.DataModels.WeatherResponse
+import com.example.weatherapp.DataLayer.Model.Services.LocalDataSource.WeatherLocalDataSource
 import com.example.weatherapp.DataLayer.Model.Services.LocalDataSource.WeatherLocalDataSourceImpl
 import com.example.weatherapp.DataLayer.Model.Services.RemoteDataSource.RemoteDataSource
 import com.example.weatherapp.Utilities.SettingsConstants
-import com.example.weatherforecast.sharedprefernces.SharedPreferencesHelper
 import kotlinx.coroutines.flow.Flow
 
-class WeatherRepoImpl private constructor(
+class WeatherRepoImpl (
     private val weatherRemoteDataSource: RemoteDataSource,
-    private val weatherLocalDataSource: WeatherLocalDataSourceImpl
+    private val weatherLocalDataSource: WeatherLocalDataSource
 ) : WeatherRepo {
 
     companion object{
@@ -32,28 +30,20 @@ class WeatherRepoImpl private constructor(
     override suspend fun getCurrentWeatherfor(lat: Double , lon: Double): Flow<WeatherResponse> {
         val lang = SettingsConstants.getLangCode()
         val unit = "metric"
-        Log.i("TAG", "getCurrentWeatherFor: " + lat + lon)
         return weatherRemoteDataSource.getCurrentWeather(lat, lon, lang,unit)
     }
 
-    override suspend fun getLocalAllLocation(): Flow<List<FaviourateLocationDto>> {
+    override suspend fun getLocalLocation(): Flow<List<FavouriteLocationDto>> {
         return weatherLocalDataSource.getAllLocation()
     }
 
-    override suspend fun insertLocation(location: FaviourateLocationDto) {
+    override suspend fun insertLocation(location: FavouriteLocationDto) {
         weatherLocalDataSource.insertLocation(location)
     }
 
-    override suspend fun deleteLocation(location: FaviourateLocationDto) {
+    override suspend fun deleteLocation(location: FavouriteLocationDto) {
         weatherLocalDataSource.deleteLocation(location)
     }
 
-    override suspend fun getFavouriteWeather(
-        lat: Double,
-        lon: Double,
-        lang: String,
-        units: String
-    ): Flow<WeatherResponse> {
-        return weatherRemoteDataSource.getCurrentWeather(lat, lon, lang, units)
-    }
+
 }

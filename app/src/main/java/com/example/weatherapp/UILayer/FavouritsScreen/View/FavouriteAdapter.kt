@@ -6,14 +6,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.weatherapp.DataLayer.Model.DataModels.FaviourateLocationDto
+import com.example.weatherapp.DataLayer.Model.DataModels.FavouriteLocationDto
 import com.example.weatherapp.databinding.FavItemBinding
 
 
 class FavouriteAdapter(val context: Context,
-                       private val onClick : (FaviourateLocationDto) -> Unit
+                       private val onClick : (FavouriteLocationDto) -> Unit
 
-): ListAdapter<FaviourateLocationDto, FavouriteAdapter.FavViewHolder>(FavDiffUtil()) {
+): ListAdapter<FavouriteLocationDto, FavouriteAdapter.FavViewHolder>(FavDiffUtil()) {
     class FavViewHolder(val favItemBinding: FavItemBinding) : RecyclerView.ViewHolder(favItemBinding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavViewHolder {
@@ -26,35 +26,23 @@ class FavouriteAdapter(val context: Context,
 
     override fun onBindViewHolder(holder: FavViewHolder, position: Int) {
         var current = getItem(position)
-
-        //val image = "https://openweathermap.org/img/wn/${current.weather?.get(0)?.icon}@2x.png"
-
         holder.favItemBinding.locationName.text = current.countryName.take(15)
-
         holder.favItemBinding.locationLat.text =
             "${String.format("%.2f", current.locationKey.lat)}, ${String.format("%.2f", current.locationKey.long)}"
-
-
         holder.favItemBinding.cardLocation.setOnClickListener {
             onClick(current)
         }
-    }
-
-    fun deleteItemAtPosition(position: Int) {
-        val newList = currentList.toMutableList()
-        newList.removeAt(position)
-        submitList(newList)
     }
 }
 
 
 
-class FavDiffUtil : DiffUtil.ItemCallback<FaviourateLocationDto>(){
-    override fun areItemsTheSame(oldItem: FaviourateLocationDto, newItem: FaviourateLocationDto): Boolean {
+class FavDiffUtil : DiffUtil.ItemCallback<FavouriteLocationDto>(){
+    override fun areItemsTheSame(oldItem: FavouriteLocationDto, newItem: FavouriteLocationDto): Boolean {
         return oldItem === newItem
     }
 
-    override fun areContentsTheSame(oldItem: FaviourateLocationDto, newItem: FaviourateLocationDto): Boolean {
+    override fun areContentsTheSame(oldItem: FavouriteLocationDto, newItem: FavouriteLocationDto): Boolean {
         return oldItem == newItem
     }
 

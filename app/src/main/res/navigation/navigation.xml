@@ -35,7 +35,7 @@
         <argument
             android:name="obj"
             android:defaultValue="@null"
-            app:argType="com.example.weatherapp.DataLayer.Model.DataModels.FaviourateLocationDto"
+            app:argType="com.example.weatherapp.DataLayer.Model.DataModels.FavouriteLocationDto"
             app:nullable="true" />
     </fragment>
     <fragment

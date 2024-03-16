@@ -1,10 +1,7 @@
 package com.example.weatherapp.Utilities
 
-import android.content.Context
-import androidx.navigation.Navigation.findNavController
-import androidx.navigation.findNavController
+
 import com.example.weatherapp.R
-import com.example.weatherforecast.sharedprefernces.SharedPreferencesHelper
 
 object SettingsConstants {
     var location: Location = Location.GPS
